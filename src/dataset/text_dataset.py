@@ -1,8 +1,9 @@
 import torch
-from torch.utils.data import Dataset,DataLoader
+from torch.utils.data import Dataset, DataLoader
 import duckdb
 from src.preprocessing.text_cleaner import clean_text
 from src.preprocessing.vocab import Vocabulary
+
 
 class TextCatalogDataset(Dataset):
     def __init__(self, texts, labels, vocab, category2idx):
@@ -21,12 +22,15 @@ class TextCatalogDataset(Dataset):
         label_idx = self.category2idx[label]
         return torch.tensor(text_ids, dtype=torch.long), torch.tensor(label_idx, dtype=torch.long)
 
+
 def collate_fn(batch):
     texts, labels = zip(*batch)
     lengths = torch.tensor([len(text) for text in texts], dtype=torch.long)
-    padded_texts = torch.nn.utils.rnn.pad_sequence(texts, batch_first=True, padding_value=0)
+    padded_texts = torch.nn.utils.rnn.pad_sequence(
+        texts, batch_first=True, padding_value=0)
     labels = torch.stack(labels)
     return padded_texts, lengths, labels
+
 
 def load_train_data():
     conn = duckdb.connect(database='catalog.db', read_only=False)
@@ -44,10 +48,13 @@ def load_train_data():
     unique_categories = sorted(set(train_labels))
     category2idx = {cat: idx for idx, cat in enumerate(unique_categories)}
 
-    dataset = TextCatalogDataset(cleaned_train_text, train_labels, vocab, category2idx)
-    loader = DataLoader(dataset, batch_size=32, shuffle=True, collate_fn=collate_fn)
+    dataset = TextCatalogDataset(
+        cleaned_train_text, train_labels, vocab, category2idx)
+    loader = DataLoader(dataset, batch_size=32,
+                        shuffle=True, collate_fn=collate_fn)
 
     return loader, vocab, category2idx
+
 
 def load_val_data(vocab, category2idx):
     conn = duckdb.connect(database='catalog.db', read_only=False)
@@ -60,12 +67,15 @@ def load_val_data(vocab, category2idx):
     val_text, val_labels = zip(*val_data)
     cleaned_val_text = list(map(clean_text, val_text))
 
-    dataset = TextCatalogDataset(cleaned_val_text, val_labels, vocab, category2idx)
-    loader = DataLoader(dataset, batch_size=32, shuffle=False, collate_fn=collate_fn)
+    dataset = TextCatalogDataset(
+        cleaned_val_text, val_labels, vocab, category2idx)
+    loader = DataLoader(dataset, batch_size=32,
+                        shuffle=False, collate_fn=collate_fn)
 
     return loader
+
+
 if __name__ == "__main__":
     loader, vocab, category2idx = load_train_data()
     batch_texts, batch_lengths, batch_labels = next(iter(loader))
     print("Batch texts shape:", batch_texts.shape)
-    
