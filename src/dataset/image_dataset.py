@@ -38,7 +38,7 @@ def load_image_data(split, category2idx, batch_size=4):
         WHERE products.split = ? 
           AND product_images.image_path IS NOT NULL 
           AND products.category_id IS NOT NULL
-          
+          AND product_images.image_order = 1
     """, (split,)).fetchall()
     
     image_paths, labels = zip(*data)
