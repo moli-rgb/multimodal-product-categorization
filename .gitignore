@@ -1,0 +1,9 @@
+data/
+*.pth
+*.pt
+*.onnx
+*.db
+*.sqlite3
+**/__pycache__/
+*.pyc
+.ipynb_checkpoints/
