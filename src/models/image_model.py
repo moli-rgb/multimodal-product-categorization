@@ -70,7 +70,7 @@ if __name__ == "__main__":
         if val_f1 > best_f1:
             best_f1 = val_f1
             epochs_without_improvement = 0
-
+            torch.save(model.state_dict(), '/content/drive/MyDrive/best_image_model.pth')
             print(f"  → New best model saved! F1: {best_f1:.4f}")
         else:
             epochs_without_improvement += 1

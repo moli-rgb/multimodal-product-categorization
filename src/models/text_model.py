@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from src.dataset.text_dataset import load_train_data,load_val_data
-from sklearn.metrics import classification_report, f1_score   
+from sklearn.metrics import f1_score   
 
 class TextClassifier(nn.Module):
     def __init__(self, vocab_size, embedding_dim, hidden_dim, num_classes):
