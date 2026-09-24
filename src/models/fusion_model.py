@@ -157,4 +157,4 @@ if __name__ == "__main__":
     ).to(device)
 
     train_fusion_model(model, train_loader, val_loader,
-                       num_epochs=1, learning_rate=1e-3, patience=3)
+                       num_epochs=10, learning_rate=1e-3, patience=3)
