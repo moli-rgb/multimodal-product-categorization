@@ -6,4 +6,4 @@ data/
 *.sqlite3
 **/__pycache__/
 *.pyc
-.ipynb_checkpoints/
+.ipynb_checkpoints/testing.ipynb
