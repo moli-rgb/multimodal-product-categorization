@@ -5,7 +5,9 @@ from torch.utils.data import DataLoader
 from torchvision import models
 from src.dataset.fusion_dataset import FusionDataset, load_fusion_data, fusion_collate_fn
 from src.preprocessing.vocab import Vocabulary
+import os
 
+SAVE_DIR = '/content/drive/MyDrive' if os.path.exists('/content/drive/MyDrive') else '.'
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
@@ -117,7 +119,7 @@ def train_fusion_model(model, train_loader, val_loader, num_epochs=10, learning_
         if val_f1 > best_f1:
             best_f1 = val_f1
             epochs_without_improvement = 0
-            torch.save(model.state_dict(), 'best_fusion_model.pth')
+            torch.save(model.state_dict(), os.path.join(SAVE_DIR, 'best_fusion_model.pth'))
         else:
             epochs_without_improvement += 1
 
