@@ -4,7 +4,9 @@ from torchvision import models
 from src.dataset.text_dataset import load_train_data
 from src.dataset.image_dataset import load_image_data
 from sklearn.metrics import f1_score
+import os
 
+SAVE_DIR = '/content/drive/MyDrive' if os.path.exists('/content/drive/MyDrive') else '.'
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 class ImageClassifier(nn.Module):
@@ -31,7 +33,7 @@ def evaluate_image_model(model, val_loader):
             all_labels.extend(batch_labels.tolist())
 
     macro_f1 = f1_score(all_labels, all_predictions, average='macro', zero_division=0)
-    return macro_f1
+    return macro_f1, all_predictions, all_labels
 
 if __name__ == "__main__":
     _, vocab, category2idx = load_train_data()
@@ -63,14 +65,14 @@ if __name__ == "__main__":
         avg_loss = total_loss / len(train_loader)
         print(f"Epoch {epoch+1}, Average Loss: {avg_loss}")
 
-        val_f1 = evaluate_image_model(model, val_loader)
+        val_f1, _, _   = evaluate_image_model(model, val_loader)
         print(f"  → Validation macro-F1: {val_f1:.4f}")
         model.train()
 
         if val_f1 > best_f1:
             best_f1 = val_f1
             epochs_without_improvement = 0
-            torch.save(model.state_dict(), '/content/drive/MyDrive/best_image_model.pth')
+            torch.save(model.state_dict(), os.path.join(SAVE_DIR, 'best_image_model.pth'))
             print(f"  → New best model saved! F1: {best_f1:.4f}")
         else:
             epochs_without_improvement += 1

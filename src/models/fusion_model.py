@@ -84,8 +84,8 @@ def evaluate_fusion_model(model, val_loader):
             predictions = output.argmax(dim=1)
             all_predictions.extend(predictions.cpu().tolist())
             all_labels.extend(labels.cpu().tolist())
-
-    return f1_score(all_labels, all_predictions, average='macro', zero_division=0)
+    macro_f1 = f1_score(all_labels, all_predictions, average='macro', zero_division=0)
+    return macro_f1, all_predictions, all_labels
 
 
 def train_fusion_model(model, train_loader, val_loader, num_epochs=10, learning_rate=1e-3, patience=3):
@@ -112,7 +112,7 @@ def train_fusion_model(model, train_loader, val_loader, num_epochs=10, learning_
             total_loss += loss.item()
 
         avg_loss = total_loss / max(len(train_loader), 1)
-        val_f1 = evaluate_fusion_model(model, val_loader)
+        val_f1, _, _  = evaluate_fusion_model(model, val_loader)
         print(
             f"Epoch {epoch + 1:02d} | loss={avg_loss:.4f} | val_macro_f1={val_f1:.4f}")
 

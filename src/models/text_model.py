@@ -29,7 +29,7 @@ def evaluate(model, val_loader):
             all_labels.extend(batch_labels.tolist())
 
     macro_f1 = f1_score(all_labels, all_predictions, average='macro', zero_division=0)
-    return macro_f1
+    return macro_f1, all_predictions, all_labels
 
 if __name__ == "__main__":
     loader, vocab, category2idx = load_train_data()
@@ -55,7 +55,7 @@ if __name__ == "__main__":
         avg_loss = total_loss / len(loader)
         print(f"Epoch {epoch+1}, Average Loss: {avg_loss}")
 
-        val_f1 = evaluate(model, val_loader)
+        val_f1,_,_ = evaluate(model, val_loader)
         print(f"  → Validation macro-F1: {val_f1:.4f}")
         model.train()
 
