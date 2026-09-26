@@ -38,7 +38,7 @@ def load_train_data():
     train_data = conn.execute("""
         SELECT title, category_id 
         FROM products 
-        WHERE split = 'train' AND title IS NOT NULL AND title != '' AND category_id IS NOT NULL
+        WHERE split = 'train' AND title IS NOT NULL AND title != '' AND category_id IS NOT NULL 
     """).fetchall()
     train_text, train_labels = zip(*train_data)
     cleaned_train_text = list(map(clean_text, train_text))
@@ -56,14 +56,15 @@ def load_train_data():
     return loader, vocab, category2idx
 
 
-def load_val_data(vocab, category2idx):
+def load_val_data(split, vocab, category2idx):
     conn = duckdb.connect(database='catalog.db', read_only=False)
     cursor = conn.cursor()
     val_data = conn.execute("""
         SELECT title, category_id 
         FROM products 
-        WHERE split = 'val' AND title IS NOT NULL AND title != '' AND category_id IS NOT NULL
-    """).fetchall()
+        WHERE split = ? AND title IS NOT NULL AND title != '' AND category_id IS NOT NULL
+        ORDER BY product_id
+    """, (split,)).fetchall()
     val_text, val_labels = zip(*val_data)
     cleaned_val_text = list(map(clean_text, val_text))
 

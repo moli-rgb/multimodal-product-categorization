@@ -30,13 +30,14 @@ class ImageEncoder(nn.Module):
         self.backbone = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
         in_features = self.backbone.fc.in_features
         self.backbone.fc = nn.Identity()
+        self.activation = nn.Tanh()  
         self.proj = nn.Linear(in_features, output_dim)
         for name, param in self.backbone.named_parameters():
             param.requires_grad = 'layer4' in name
             
     def forward(self, images):
         features = self.backbone(images)
-        return self.proj(features)
+        return self.activation(self.proj(features))
 
 def get_optimizer(model, backbone_lr=1e-5, head_lr=1e-3):
     backbone_params = model.image_encoder.backbone.parameters()
@@ -156,5 +157,4 @@ if __name__ == "__main__":
         num_classes=len(category2idx),
     ).to(device)
 
-    train_fusion_model(model, train_loader, val_loader,
-                       num_epochs=10, learning_rate=1e-3, patience=3)
+train_fusion_model(model, train_loader, val_loader, num_epochs=1, learning_rate=1e-3, patience=3)

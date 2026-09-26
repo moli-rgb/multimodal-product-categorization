@@ -33,7 +33,7 @@ def evaluate(model, val_loader):
 
 if __name__ == "__main__":
     loader, vocab, category2idx = load_train_data()
-    val_loader = load_val_data(vocab, category2idx)     
+    val_loader = load_val_data("val",vocab, category2idx)     
     model = TextClassifier(vocab_size=len(vocab), embedding_dim=50, hidden_dim=64, num_classes=len(category2idx))
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
