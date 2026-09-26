@@ -128,7 +128,6 @@ def train_fusion_model(model, train_loader, val_loader, num_epochs=10, learning_
             print(f"Early stopping triggered at epoch {epoch + 1}")
             break
     return best_f1
-
 if __name__ == "__main__":
     train_titles, train_image_paths, train_labels = load_fusion_data('train')
     val_titles, val_image_paths, val_labels = load_fusion_data('val')
@@ -155,4 +154,4 @@ if __name__ == "__main__":
         image_feature_dim=256,
         num_classes=len(category2idx),
     ).to(device)
-    train_fusion_model(model, train_loader, val_loader, num_epochs=1, learning_rate=1e-3, patience=3)
+    train_fusion_model(model, train_loader, val_loader, num_epochs=10, learning_rate=1e-3, patience=3)
