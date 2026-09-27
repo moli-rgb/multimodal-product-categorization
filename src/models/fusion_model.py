@@ -154,4 +154,4 @@ if __name__ == "__main__":
         image_feature_dim=256,
         num_classes=len(category2idx),
     ).to(device)
-    train_fusion_model(model, train_loader, val_loader, num_epochs=10, learning_rate=1e-3, patience=3)
+    train_fusion_model(model, train_loader, val_loader, num_epochs=20, learning_rate=1e-3, patience=3)
