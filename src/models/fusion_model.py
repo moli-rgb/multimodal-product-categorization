@@ -6,6 +6,7 @@ from torchvision import models
 from src.dataset.fusion_dataset import FusionDataset, load_fusion_data, fusion_collate_fn
 from src.preprocessing.vocab import Vocabulary
 import os
+import json
 
 SAVE_DIR = '/content/drive/MyDrive' if os.path.exists('/content/drive/MyDrive') else '.'
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -146,6 +147,8 @@ if __name__ == "__main__":
     categories = sorted(set(train_labels))
     category2idx = {category: idx for idx, category in enumerate(categories)}
 
+    with open(os.path.join(SAVE_DIR, 'fusion_vocab.json'), 'w') as f:
+        json.dump({'word2idx': vocab.word2idx, 'category2idx': category2idx}, f)
     image_transform = models.ResNet18_Weights.DEFAULT.transforms()
     train_dataset = FusionDataset(
         train_titles, train_image_paths, train_labels, vocab, category2idx, image_transform)
@@ -164,4 +167,4 @@ if __name__ == "__main__":
         image_feature_dim=256,
         num_classes=len(category2idx),
     ).to(device)
-    train_fusion_model(model, train_loader, val_loader, num_epochs=3, learning_rate=1e-3, patience=3)
+    train_fusion_model(model, train_loader, val_loader, num_epochs=20, learning_rate=1e-3, patience=3)

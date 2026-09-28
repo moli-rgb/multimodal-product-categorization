@@ -2,7 +2,6 @@ import torch
 from sklearn.metrics import f1_score
 from torch.utils.data import DataLoader
 from torchvision import models
-
 from src.dataset.text_dataset import load_train_data, load_val_data
 from src.dataset.image_dataset import load_image_data
 from src.dataset.fusion_dataset import FusionDataset, load_fusion_data, fusion_collate_fn
@@ -10,6 +9,8 @@ from src.models.text_model import TextClassifier
 from src.models.image_model import ImageClassifier
 from src.models.fusion_model import FusionClassifier
 from src.preprocessing.vocab import Vocabulary
+import json
+import os
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -63,12 +64,12 @@ def evaluate_image_model():
 
 
 def evaluate_fusion_model():
-    train_titles, _, train_labels = load_fusion_data('train')
     test_titles, test_image_paths, test_labels = load_fusion_data('test')
 
-    vocab = Vocabulary(train_titles, min_freq=2)
-    categories = sorted(set(train_labels))
-    category2idx = {c: i for i, c in enumerate(categories)}
+    with open('fusion_vocab.json') as f:
+        saved = json.load(f)
+    vocab = Vocabulary.from_word2idx(saved['word2idx'])
+    category2idx = saved['category2idx']
 
     image_transform = models.ResNet18_Weights.DEFAULT.transforms()
     test_dataset = FusionDataset(

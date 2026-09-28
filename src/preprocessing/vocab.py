@@ -1,7 +1,6 @@
 from collections import Counter
 from src.preprocessing.text_cleaner import clean_text
 
-
 class Vocabulary:
     def __init__(self, texts, min_freq=2):
         self.texts = texts
@@ -23,4 +22,10 @@ class Vocabulary:
 
     def __len__(self):
         return len(self.word2idx)
+    
+    @classmethod
+    def from_word2idx(cls, word2idx):
+        vocab = cls([], min_freq=2)
+        vocab.word2idx = word2idx
+        return vocab
 

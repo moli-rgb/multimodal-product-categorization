@@ -49,6 +49,7 @@ def load_fusion_data(split):
           AND product_images.image_path IS NOT NULL
           AND product_images.image_order = 1
         QUALIFY ROW_NUMBER() OVER (PARTITION BY products.product_id ORDER BY products.product_id) = 1
+        ORDER BY products.product_id
     """, (split,)).fetchall()
 
     titles, image_paths, labels = zip(*data)
