@@ -120,13 +120,14 @@ def train_fusion_model(model, train_loader, val_loader, num_epochs=10, learning_
         if val_f1 > best_f1:
             best_f1 = val_f1
             epochs_without_improvement = 0
+            save_path = os.path.join(SAVE_DIR, 'best_fusion_model.pth')
             torch.save(model.state_dict(), os.path.join(SAVE_DIR, 'best_fusion_model.pth'))
             verification_model = FusionClassifier(
                 vocab_size=model.text_encoder.embedding.num_embeddings,
                 embedding_dim=64, hidden_dim=256, image_feature_dim=256,
                 num_classes=model.classifier[-1].out_features
             ).to(device)
-            verification_model.load_state_dict(torch.load(SAVE_DIR, map_location=device))
+            verification_model.load_state_dict(torch.load(save_path, map_location=device))
             verify_f1, _, _ = evaluate_fusion_model(verification_model, val_loader)
             print(f"after reloading the saved file: {verify_f1:.4f}")
         
