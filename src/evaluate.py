@@ -2,7 +2,7 @@ import torch
 from sklearn.metrics import f1_score
 from torch.utils.data import DataLoader
 from torchvision import models
-from src.dataset.text_dataset import load_train_data, load_val_data
+from src.dataset.text_dataset import load_train_data, TextCatalogDataset,collate_fn
 from src.dataset.image_dataset import load_image_data
 from src.dataset.fusion_dataset import FusionDataset, load_fusion_data, fusion_collate_fn
 from src.models.text_model import TextClassifier
@@ -17,7 +17,10 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def evaluate_text_model():
     _, vocab, category2idx = load_train_data()
-    test_loader = load_val_data('test', vocab, category2idx)
+    test_titles, _, test_labels = load_fusion_data('test')
+
+    dataset = TextCatalogDataset(test_titles, test_labels, vocab, category2idx)
+    test_loader = DataLoader(dataset, batch_size=32, shuffle=False, collate_fn=collate_fn)
 
     model = TextClassifier(vocab_size=len(
         vocab), embedding_dim=50, hidden_dim=64, num_classes=len(category2idx))
@@ -36,7 +39,7 @@ def evaluate_text_model():
 
     f1 = f1_score(all_labels, all_preds, average='macro', zero_division=0)
     print(f"GRU macro-F1: {f1:.4f}")
-    return f1
+    return f1, all_preds, all_labels
 
 
 def evaluate_image_model():
@@ -101,10 +104,18 @@ def evaluate_fusion_model():
 
     f1 = f1_score(all_labels, all_preds, average='macro', zero_division=0)
     print(f"Fusion macro-F1: {f1:.4f}")
-    return f1
+    return f1, all_preds, all_labels
 
 
 if __name__ == "__main__":
-    text_f1 = evaluate_text_model()
+    text_f1, text_preds, text_labels = evaluate_text_model()
     image_f1 = evaluate_image_model()
-    fusion_f1 = evaluate_fusion_model()
+    fusion_f1, fusion_preds, fusion_labels = evaluate_fusion_model()
+    with open('predictions_for_bootstrap.json', 'w') as f:
+        json.dump({
+            'text_preds': text_preds,
+            'text_labels': text_labels,
+            'fusion_preds': fusion_preds,
+            'fusion_labels': fusion_labels,
+        }, f)
+    print("the predictions was saved in [predictions_for_bootstrap.json]")
